@@ -1,11 +1,12 @@
-import {Injectable} from '@angular/core';
-import {Actions, Effect, ofType} from '@ngrx/effects';
-import {AngularFireAuth} from '@angular/fire/auth';
-import {from, Observable, of} from 'rxjs';
-import {Action} from '@ngrx/store';
+import { Injectable } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import { from, Observable, of } from 'rxjs';
+import { catchError, map, mapTo, switchMap } from 'rxjs/operators';
 
 import * as customEmailHandlerActions from '../actions/custom-email-handler.actions';
-import {catchError, map, mapTo, switchMap} from 'rxjs/operators';
+
+//import {Action} from '@ngrx/store';
 
 export type Action = customEmailHandlerActions.CustomEmailHandlerActionsUnion;
 
@@ -32,7 +33,7 @@ export class CustomEmailHandlerEffects {
     switchMap(payload => {
       return from(this.afAuth.auth.verifyPasswordResetCode(payload.actionCode)).pipe(
         switchMap((email: string) => {
-          return of(new customEmailHandlerActions.VerifyPasswordResetCodeSuccess({email, actionCode: payload.actionCode}));
+          return of(new customEmailHandlerActions.VerifyPasswordResetCodeSuccess({ email, actionCode: payload.actionCode }));
         }),
         catchError(error => of(new customEmailHandlerActions.VerifyPasswordResetCodeError(error)))
       );
@@ -61,7 +62,7 @@ export class CustomEmailHandlerEffects {
       return from(this.afAuth.auth.checkActionCode(payload.actionCode)).pipe(
         map(info => info['data']['email']),
         switchMap((restoredEmail: string) => {
-          return of(new customEmailHandlerActions.CheckActionCodeSuccess({actionCode: payload.actionCode, restoredEmail}));
+          return of(new customEmailHandlerActions.CheckActionCodeSuccess({ actionCode: payload.actionCode, restoredEmail }));
         }),
         catchError(error => of(new customEmailHandlerActions.CheckActionCodeError(error)))
       );
@@ -83,7 +84,7 @@ export class CustomEmailHandlerEffects {
   );
 
   constructor(private actions$: Actions,
-              private afAuth: AngularFireAuth) {
+    private afAuth: AngularFireAuth) {
 
   }
 }
